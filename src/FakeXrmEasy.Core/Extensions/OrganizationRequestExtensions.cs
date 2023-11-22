@@ -209,5 +209,32 @@ namespace FakeXrmEasy.Extensions.OrganizationRequests
 
             return request;
         }
+
+        public static void EvaluateConcurrencyBehaviorForRequest(this OrganizationRequest request, XrmFakedContext context)
+        {
+            if (!request.IsUpdateRequest() && !request.IsDeleteRequest())
+            {
+                throw new InvalidOperationException("Concurrency Behavior is supported only for Update and Delete requests");
+            }
+
+            if (request.Parameters["ConcurrencyBehavior"] != ConcurrencyBehavior.IfRowVersionMatches)
+            {
+                return; // If null, default, or AlwaysOverwrite, no need to check row version
+            }
+
+            if (!int.TryParse(request.Target.RowVersion, out int targetRowVersion))
+            {
+                throw new InvalidOperationException("Target must have valid RowVersion when IfRowVersionMatches specified as ConcurrencyBehavior for request");
+            } 
+
+            if (!int.TryParse(context.GetEntityById(request.Target.Id).RowVersion, out int cachedEntityRowVersion))
+            {
+                throw new InvalidOperationException("Retrieved entity has invalid RowVersion");
+            }
+
+            
+            
+            
+        }
     }
 }
