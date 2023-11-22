@@ -128,7 +128,7 @@ namespace FakeXrmEasy.Core.Db
 
             table = _tables[e.LogicalName];
 
-            e.RowVersion = ++_dbRowVersion;
+            e.RowVersion = (++_dbRowVersion).ToString();
 
             if (table.Contains(e))
             {
