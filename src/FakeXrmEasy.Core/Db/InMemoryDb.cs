@@ -18,11 +18,17 @@ namespace FakeXrmEasy.Core.Db
         protected internal Dictionary<string, InMemoryTable> _tables;
 
         /// <summary>
+        /// The internal row version stamp, incremented with every Create or Update operation within the DB
+        /// </summary>
+        protected internal int _dbRowVersion;
+
+        /// <summary>
         /// Default InMemoryDb constructor with an empty list of tables
         /// </summary>
         public InMemoryDb()
         {
             _tables = new Dictionary<string, InMemoryTable>();
+            _dbRowVersion = 0;
         }
 
         /// <summary>
@@ -121,6 +127,8 @@ namespace FakeXrmEasy.Core.Db
             }
 
             table = _tables[e.LogicalName];
+
+            e.RowVersion = ++_dbRowVersion;
 
             if (table.Contains(e))
             {
